@@ -3,6 +3,7 @@ from typing import Optional
 
 from app.core.config import Settings
 from app.models.schemas import GeneratedSQL, QueryRequest, SourceKind
+from app.services.connectors import get_jdbc_sources
 from app.services.llm import OCIChatModelFactory
 from app.services.metadata import CatalogMetadataService
 
@@ -19,13 +20,18 @@ class NL2SQLAgentService:
 
     def generate(self, request: QueryRequest) -> tuple[list[SourceKind], list[GeneratedSQL], Optional[str]]:
         sources = self._resolve_sources(request)
+        available_sources = self._available_sources()
+        executable_sources = [source for source in sources if source in available_sources]
+
+        if not executable_sources:
+            return sources, [], self.settings.oci_model_id
 
         if self.llm:
-            candidate = self._generate_with_oci(request, sources)
+            candidate = self._generate_with_oci(request, executable_sources)
             if candidate:
                 return sources, candidate, self.settings.oci_model_id
 
-        return sources, self._fallback_sql(request, sources), self.settings.oci_model_id
+        return sources, self._fallback_sql(request, executable_sources), self.settings.oci_model_id
 
     def _resolve_sources(self, request: QueryRequest) -> list[SourceKind]:
         preferred = [source for source in request.source_preference if source != SourceKind.auto]
@@ -42,6 +48,16 @@ class NL2SQLAgentService:
         if "oracle" in question:
             return [SourceKind.oracle]
         return [SourceKind.polaris, SourceKind.mysql, SourceKind.postgresql, SourceKind.oracle]
+
+    def _available_sources(self) -> set[SourceKind]:
+        available = {
+            source.source
+            for source in get_jdbc_sources(self.settings)
+            if source.enabled
+        }
+        if self.settings.polaris_uri:
+            available.add(SourceKind.polaris)
+        return available
 
     def _generate_with_oci(
         self,

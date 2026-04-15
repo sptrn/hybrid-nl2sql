@@ -79,6 +79,20 @@ class SparkManager:
             ],
         ]
 
+    def enabled_sources(self) -> set[SourceKind]:
+        jdbc_sources = get_jdbc_sources(self.settings)
+        enabled = {
+            source.source
+            for source in jdbc_sources
+            if source.enabled
+        }
+        if self.settings.polaris_uri:
+            enabled.add(SourceKind.polaris)
+        return enabled
+
+    def is_source_enabled(self, source: SourceKind) -> bool:
+        return source in self.enabled_sources()
+
     def introspect_polaris_metadata(self) -> list[dict[str, Any]]:
         spark = self.session
         if spark is None or not self.settings.polaris_uri:

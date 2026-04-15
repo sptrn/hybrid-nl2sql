@@ -70,6 +70,11 @@ def query(request: QueryRequest) -> QueryResponse:
     guardrails = get_guardrails()
 
     selected_sources, generated_sql, model = agent.generate(request)
+    unavailable_sources = [
+        source
+        for source in selected_sources
+        if not spark.is_source_enabled(source)
+    ]
 
     reports = [
         guardrails.validate(statement=query.statement, max_rows=request.max_rows)
@@ -77,7 +82,13 @@ def query(request: QueryRequest) -> QueryResponse:
     ]
 
     rows: list[dict] = []
-    execution_summary = "Generated SQL only."
+    if not generated_sql:
+        source_labels = ", ".join(source.value for source in unavailable_sources or selected_sources)
+        execution_summary = (
+            f"No SQL generated because the requested source is not configured: {source_labels}."
+        )
+    else:
+        execution_summary = "Generated SQL only."
     approved_query = next(
         (
             query
@@ -103,5 +114,6 @@ def query(request: QueryRequest) -> QueryResponse:
         metadata={
             "source_count": len(selected_sources),
             "spark_sources": spark.configured_sources(),
+            "unavailable_sources": [source.value for source in unavailable_sources],
         },
     )

@@ -59,7 +59,7 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Frontend:
@@ -69,6 +69,8 @@ cd frontend
 npm install
 npm run dev
 ```
+
+For access from another machine on the same network, the frontend dev server binds to `0.0.0.0:5173`. The backend should also be started with `--host 0.0.0.0` if you want the browser on another host to reach the API directly.
 
 Local metadata lab:
 
