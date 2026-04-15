@@ -2,6 +2,7 @@
 .codex
 .env
 .venv
+*.egg-info/
 __pycache__/
 *.pyc
 *.pyo
@@ -14,4 +15,3 @@ node_modules/
 coverage/
 .idea/
 .vscode/
-
