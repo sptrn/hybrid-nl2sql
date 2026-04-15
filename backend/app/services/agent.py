@@ -125,6 +125,7 @@ Respond as JSON with this shape:
 
     def _fallback_sql(self, request: QueryRequest, sources: list[SourceKind]) -> list[GeneratedSQL]:
         question = request.question.lower()
+        metadata = self.metadata_service.load().get("sources", {})
         statements: list[GeneratedSQL] = []
 
         for source in sources:
@@ -135,15 +136,17 @@ Respond as JSON with this shape:
                     "ORDER BY order_ts DESC"
                 )
             elif source == SourceKind.mysql:
+                customer_table = self._find_table_name(metadata, SourceKind.mysql, ("customer",))
                 statement = (
                     "SELECT customer_id, customer_name, region\n"
-                    "FROM mysql.crm_customers\n"
+                    f"FROM {customer_table}\n"
                     "ORDER BY customer_name"
                 )
             elif source == SourceKind.postgresql:
+                product_table = self._find_table_name(metadata, SourceKind.postgresql, ("product",))
                 statement = (
                     "SELECT product_id, product_name, category\n"
-                    "FROM postgresql.inventory_products\n"
+                    f"FROM {product_table}\n"
                     "ORDER BY product_name"
                 )
             else:
@@ -167,3 +170,22 @@ Respond as JSON with this shape:
             )
 
         return statements
+
+    @staticmethod
+    def _find_table_name(
+        metadata: dict,
+        source: SourceKind,
+        preferred_terms: tuple[str, ...],
+    ) -> str:
+        tables = metadata.get(source.value, [])
+        for table in tables:
+            table_name = table.get("name", "")
+            lowered = table_name.lower()
+            if any(term in lowered for term in preferred_terms):
+                return table_name
+        if tables:
+            return tables[0].get("name", "")
+        return {
+            SourceKind.mysql: "sampledb.customers",
+            SourceKind.postgresql: "public.inventory_products",
+        }.get(source, "unknown_table")

@@ -1,9 +1,10 @@
 from collections import defaultdict
 from typing import Any
+from typing import Optional
 
 from app.core.config import Settings
 from app.models.schemas import GeneratedSQL, SourceKind
-from app.services.connectors import get_jdbc_sources
+from app.services.connectors import JDBCSourceConfig, get_jdbc_sources
 
 
 class SparkManager:
@@ -92,6 +93,9 @@ class SparkManager:
 
     def is_source_enabled(self, source: SourceKind) -> bool:
         return source in self.enabled_sources()
+
+    def get_jdbc_source(self, source: SourceKind) -> Optional[JDBCSourceConfig]:
+        return next((cfg for cfg in get_jdbc_sources(self.settings) if cfg.source == source), None)
 
     def introspect_polaris_metadata(self) -> list[dict[str, Any]]:
         spark = self.session
@@ -278,6 +282,21 @@ class SparkManager:
         statement = generated_sql.statement.rstrip(";")
         if "limit" not in statement.lower():
             statement = f"{statement}\nLIMIT {max_rows}"
+
+        jdbc_source = self.get_jdbc_source(generated_sql.source)
+        if jdbc_source and jdbc_source.enabled:
+            try:
+                dataframe = self._read_jdbc_query(
+                    jdbc_url=jdbc_source.jdbc_url or "",
+                    query=statement,
+                    user=jdbc_source.username or "",
+                    password=jdbc_source.password or "",
+                    driver=jdbc_source.driver,
+                )
+                rows = [row.asDict(recursive=True) for row in dataframe.limit(max_rows).collect()]
+                return rows, f"Executed against JDBC source '{generated_sql.source.value}'."
+            except Exception as exc:
+                return [], f"JDBC execution skipped or failed: {exc}"
 
         try:
             dataframe = spark.sql(statement)

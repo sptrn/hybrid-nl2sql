@@ -1,4 +1,6 @@
+import os
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 from pydantic import Field
@@ -7,7 +9,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(".env", "../.env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -75,4 +76,19 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    env_file_override = os.getenv("APP_ENV_FILE")
+    if env_file_override:
+        return Settings(_env_file=env_file_override)
+
+    candidate_files = [
+        Path(".env"),
+        Path(".env.local-services"),
+        Path("../.env"),
+        Path("../.env.local-services"),
+    ]
+    selected_file = next((str(path) for path in candidate_files if path.exists()), None)
+
+    if selected_file:
+        return Settings(_env_file=selected_file)
+
     return Settings()
