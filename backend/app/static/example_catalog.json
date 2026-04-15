@@ -1,0 +1,49 @@
+{
+  "sources": {
+    "polaris": [
+      {
+        "name": "sales.orders",
+        "description": "Customer orders stored as Iceberg tables.",
+        "columns": [
+          { "name": "order_id", "type": "string" },
+          { "name": "customer_id", "type": "string" },
+          { "name": "order_total", "type": "decimal(18,2)" },
+          { "name": "order_ts", "type": "timestamp" }
+        ]
+      }
+    ],
+    "mysql": [
+      {
+        "name": "crm_customers",
+        "description": "Operational CRM customers.",
+        "columns": [
+          { "name": "customer_id", "type": "bigint" },
+          { "name": "customer_name", "type": "string" },
+          { "name": "region", "type": "string" }
+        ]
+      }
+    ],
+    "postgresql": [
+      {
+        "name": "inventory_products",
+        "description": "Product master data.",
+        "columns": [
+          { "name": "product_id", "type": "bigint" },
+          { "name": "product_name", "type": "string" },
+          { "name": "category", "type": "string" }
+        ]
+      }
+    ],
+    "oracle": [
+      {
+        "name": "ar_invoices",
+        "description": "Accounts receivable invoices.",
+        "columns": [
+          { "name": "invoice_id", "type": "bigint" },
+          { "name": "account_id", "type": "bigint" },
+          { "name": "invoice_total", "type": "decimal(18,2)" }
+        ]
+      }
+    ]
+  }
+}

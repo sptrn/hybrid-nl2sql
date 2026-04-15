@@ -1,0 +1,278 @@
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  background:
+    radial-gradient(circle at top left, rgba(242, 176, 94, 0.35), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(72, 153, 145, 0.28), transparent 24%),
+    #f4efe7;
+  color: #132026;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  padding: 2rem;
+  background: rgba(19, 32, 38, 0.94);
+  color: #f7f1e8;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  color: #f2b05e;
+}
+
+.sidebar h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.95;
+}
+
+.lede {
+  margin: 0;
+  color: rgba(247, 241, 232, 0.78);
+}
+
+.status-card {
+  border: 1px solid rgba(242, 176, 94, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 1.2rem;
+  padding: 1rem;
+}
+
+.status-card h2 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.status-card dl,
+.status-card button {
+  width: 100%;
+}
+
+.status-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.6rem 0;
+}
+
+.status-card dl div:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.status-card dt {
+  color: rgba(247, 241, 232, 0.7);
+}
+
+.status-card dd {
+  margin: 0;
+}
+
+.status-card button {
+  margin-top: 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 0.9rem;
+  background: rgba(242, 176, 94, 0.14);
+  color: #f7f1e8;
+}
+
+.content {
+  padding: 2rem;
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+}
+
+.panel {
+  border-radius: 1.5rem;
+  background: rgba(255, 252, 247, 0.86);
+  box-shadow: 0 12px 40px rgba(19, 32, 38, 0.08);
+  border: 1px solid rgba(19, 32, 38, 0.08);
+}
+
+.composer {
+  padding: 1.25rem;
+}
+
+.composer form {
+  display: grid;
+  gap: 1rem;
+}
+
+.composer label {
+  display: grid;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+textarea,
+select {
+  width: 100%;
+  border: 1px solid rgba(19, 32, 38, 0.12);
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+  background: #fffdf9;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 10rem;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+}
+
+.toolbar button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.85rem 1.3rem;
+  background: #132026;
+  color: #f7f1e8;
+}
+
+.results {
+  padding: 1.25rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.panel-header h2 {
+  margin: 0 0 0.25rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.chip {
+  border-radius: 999px;
+  background: rgba(72, 153, 145, 0.12);
+  color: #24554f;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.summary,
+.empty-state {
+  color: #3e5054;
+}
+
+.sql-card {
+  margin-top: 1rem;
+  border: 1px solid rgba(19, 32, 38, 0.08);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.sql-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+pre {
+  margin: 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #132026;
+  color: #f7f1e8;
+  overflow-x: auto;
+}
+
+.issue-list {
+  color: #a53d2c;
+  margin-bottom: 0;
+}
+
+.table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(19, 32, 38, 0.08);
+}
+
+.error {
+  padding: 1rem 1.25rem;
+  color: #a53d2c;
+  border: 1px solid rgba(165, 61, 44, 0.2);
+}
+
+@media (max-width: 960px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar,
+  .content {
+    padding: 1.25rem;
+  }
+
+  .toolbar,
+  .panel-header,
+  .sql-meta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
