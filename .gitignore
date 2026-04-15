@@ -1,6 +1,7 @@
 .DS_Store
 .codex
 .env
+.env.local-services
 .venv
 *.egg-info/
 __pycache__/

@@ -28,6 +28,7 @@ The intended request flow is:
 6. The backend returns generated SQL, execution status, and result rows to the UI.
 
 More detail is in [docs/architecture.md](/home/opc/hybrid-nl2sql/docs/architecture.md).
+For a live local JDBC metadata exercise, see [docs/local-metadata-lab.md](/home/opc/hybrid-nl2sql/docs/local-metadata-lab.md).
 
 ## Repo Layout
 
@@ -67,6 +68,16 @@ Frontend:
 cd frontend
 npm install
 npm run dev
+```
+
+Local metadata lab:
+
+```bash
+cp .env.local-services.example .env.local-services
+./scripts/podman-local-services-up.sh
+python3 -m venv .venv
+.venv/bin/pip install -e backend
+./scripts/run-local-metadata-exercise.sh
 ```
 
 ## What Is Implemented

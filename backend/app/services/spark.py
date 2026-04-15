@@ -29,17 +29,18 @@ class SparkManager:
         except ImportError:
             return None
 
-        builder = (
-            SparkSession.builder.appName(self.settings.spark_app_name)
-            .master(self.settings.spark_master)
-            .config(
-                "spark.sql.extensions",
-                "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
-            )
+        builder = SparkSession.builder.appName(self.settings.spark_app_name).master(
+            self.settings.spark_master
         )
 
         if self.settings.spark_jars_packages:
             builder = builder.config("spark.jars.packages", self.settings.spark_jars_packages)
+
+        if self._iceberg_enabled:
+            builder = builder.config(
+                "spark.sql.extensions",
+                "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
+            )
 
         if self.settings.polaris_uri:
             prefix = f"spark.sql.catalog.{self.settings.polaris_catalog_name}"
@@ -54,6 +55,11 @@ class SparkManager:
                 builder = builder.config(f"{prefix}.scope", self.settings.polaris_scope)
 
         return builder.getOrCreate()
+
+    @property
+    def _iceberg_enabled(self) -> bool:
+        packages = [pkg.strip().lower() for pkg in self.settings.spark_jars_packages.split(",") if pkg.strip()]
+        return any("iceberg-spark-runtime" in pkg or pkg.startswith("org.apache.iceberg:") for pkg in packages)
 
     def configured_sources(self) -> list[dict[str, Any]]:
         jdbc_sources = get_jdbc_sources(self.settings)
@@ -182,29 +188,25 @@ class SparkManager:
 
         schema_filter = ", ".join(self._sql_literal(schema) for schema in schema_list)
         tables_query = f"""
-            (
-                SELECT
-                    table_schema,
-                    table_name,
-                    table_type
-                FROM information_schema.tables
-                WHERE table_schema IN ({schema_filter})
-                  AND table_type IN ('BASE TABLE', 'VIEW')
-                ORDER BY table_schema, table_name
-            ) {query_alias_prefix}_tables
+            SELECT
+                table_schema,
+                table_name,
+                table_type
+            FROM information_schema.tables
+            WHERE table_schema IN ({schema_filter})
+              AND table_type IN ('BASE TABLE', 'VIEW')
+            ORDER BY table_schema, table_name
         """
         columns_query = f"""
-            (
-                SELECT
-                    table_schema,
-                    table_name,
-                    column_name,
-                    data_type,
-                    ordinal_position
-                FROM information_schema.columns
-                WHERE table_schema IN ({schema_filter})
-                ORDER BY table_schema, table_name, ordinal_position
-            ) {query_alias_prefix}_columns
+            SELECT
+                table_schema,
+                table_name,
+                column_name,
+                data_type,
+                ordinal_position
+            FROM information_schema.columns
+            WHERE table_schema IN ({schema_filter})
+            ORDER BY table_schema, table_name, ordinal_position
         """
 
         try:
@@ -227,20 +229,20 @@ class SparkManager:
 
         columns_by_table: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
         for row in column_rows:
-            row_dict = row.asDict(recursive=True)
-            columns_by_table[(row_dict["table_schema"], row_dict["table_name"])].append(
+            row_dict = self._normalize_row_keys(row.asDict(recursive=True))
+            columns_by_table[(str(row_dict["table_schema"]), str(row_dict["table_name"]))].append(
                 {
-                    "name": row_dict["column_name"],
-                    "type": row_dict["data_type"],
+                    "name": str(row_dict["column_name"]),
+                    "type": str(row_dict["data_type"]),
                 }
             )
 
         tables: list[dict[str, Any]] = []
         for row in table_rows[: self.settings.metadata_max_tables_per_source]:
-            row_dict = row.asDict(recursive=True)
-            schema = row_dict["table_schema"]
-            table_name = row_dict["table_name"]
-            table_type = row_dict["table_type"]
+            row_dict = self._normalize_row_keys(row.asDict(recursive=True))
+            schema = str(row_dict["table_schema"])
+            table_name = str(row_dict["table_name"])
+            table_type = str(row_dict["table_type"])
             tables.append(
                 {
                     "name": f"{schema}.{table_name}",
@@ -382,3 +384,7 @@ class SparkManager:
 
         database = path[1].split("?", 1)[0].strip()
         return database
+
+    @staticmethod
+    def _normalize_row_keys(row_dict: dict[str, Any]) -> dict[str, Any]:
+        return {str(key).lower(): value for key, value in row_dict.items()}
