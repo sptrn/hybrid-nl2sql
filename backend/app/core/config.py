@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     spark_app_name: str = Field(default="hybrid-nl2sql", alias="SPARK_APP_NAME")
     spark_master: str = Field(default="local[*]", alias="SPARK_MASTER")
     spark_jars_packages: str = Field(default="", alias="SPARK_JARS_PACKAGES")
+    spark_iceberg_runtime_package: str = Field(
+        default="org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.8.1",
+        alias="SPARK_ICEBERG_RUNTIME_PACKAGE",
+    )
     metadata_max_namespaces: int = Field(default=25, alias="METADATA_MAX_NAMESPACES")
     metadata_max_tables_per_source: int = Field(default=100, alias="METADATA_MAX_TABLES_PER_SOURCE")
     mysql_metadata_schemas: str = Field(default="", alias="MYSQL_METADATA_SCHEMAS")
@@ -38,6 +42,18 @@ class Settings(BaseSettings):
     polaris_uri: Optional[str] = Field(default=None, alias="POLARIS_URI")
     polaris_warehouse: Optional[str] = Field(default=None, alias="POLARIS_WAREHOUSE")
     polaris_scope: Optional[str] = Field(default=None, alias="POLARIS_SCOPE")
+    polaris_credential: Optional[str] = Field(default=None, alias="POLARIS_CREDENTIAL")
+    polaris_token: Optional[str] = Field(default=None, alias="POLARIS_TOKEN")
+    polaris_access_delegation: Optional[str] = Field(
+        default="vended-credentials",
+        alias="POLARIS_ACCESS_DELEGATION",
+    )
+    polaris_token_refresh_enabled: bool = Field(
+        default=True,
+        alias="POLARIS_TOKEN_REFRESH_ENABLED",
+    )
+    polaris_client_region: Optional[str] = Field(default=None, alias="POLARIS_CLIENT_REGION")
+    polaris_catalog_options: str = Field(default="", alias="POLARIS_CATALOG_OPTIONS")
 
     mysql_jdbc_url: Optional[str] = Field(default=None, alias="MYSQL_JDBC_URL")
     mysql_jdbc_user: Optional[str] = Field(default=None, alias="MYSQL_JDBC_USER")
@@ -63,6 +79,33 @@ class Settings(BaseSettings):
     @property
     def postgres_metadata_schema_list(self) -> list[str]:
         return [schema.strip() for schema in self.postgres_metadata_schemas.split(",") if schema.strip()]
+
+    @property
+    def spark_packages(self) -> list[str]:
+        packages = [pkg.strip() for pkg in self.spark_jars_packages.split(",") if pkg.strip()]
+        if self.polaris_enabled and self.spark_iceberg_runtime_package:
+            lowered = [pkg.lower() for pkg in packages]
+            if not any("iceberg-spark-runtime" in pkg for pkg in lowered):
+                packages.append(self.spark_iceberg_runtime_package)
+        return packages
+
+    @property
+    def polaris_enabled(self) -> bool:
+        return bool(self.polaris_uri and self.polaris_warehouse)
+
+    @property
+    def polaris_catalog_option_map(self) -> dict[str, str]:
+        options: dict[str, str] = {}
+        for raw_pair in self.polaris_catalog_options.split(";"):
+            pair = raw_pair.strip()
+            if not pair or "=" not in pair:
+                continue
+            key, value = pair.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+            if key and value:
+                options[key] = value
+        return options
 
     @property
     def oci_ready(self) -> bool:

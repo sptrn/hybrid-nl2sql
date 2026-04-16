@@ -41,6 +41,7 @@
   - JDBC-backed MySQL views
   - JDBC-backed PostgreSQL views
   - JDBC-backed Oracle views
+- When Polaris is enabled, Spark receives the common Iceberg REST catalog properties used by Polaris deployments, including `warehouse`, `scope`, OAuth `credential` or bearer `token`, `header.X-Iceberg-Access-Delegation`, and optional extra catalog properties from `POLARIS_CATALOG_OPTIONS`
 
 ### Metadata Layer
 

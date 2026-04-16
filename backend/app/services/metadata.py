@@ -50,6 +50,17 @@ class CatalogMetadataService:
                     f"- Table {table['name']}: {table.get('description', 'No description')}. "
                     f"Columns: {columns}"
                 )
+            if source_name == SourceKind.polaris.value:
+                backup_tables = [
+                    table["name"]
+                    for table in tables
+                    if str(table.get("name", "")).startswith(f"{self.settings.polaris_catalog_name}.backups.")
+                ]
+                if backup_tables:
+                    fragments.append(
+                        "Polaris backup namespaces available: "
+                        + ", ".join(backup_tables[:20])
+                    )
         return "\n".join(fragments)
 
     def source_overview(

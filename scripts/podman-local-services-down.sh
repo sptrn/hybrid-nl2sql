@@ -10,7 +10,7 @@ mkdir -p "${PODMAN_ROOT}" "${PODMAN_RUNROOT}" "${PODMAN_TMPDIR}"
 export TMPDIR="${PODMAN_TMPDIR}"
 export CONTAINERS_IMAGE_COPY_TMPDIR="${PODMAN_TMPDIR}"
 
-for container in hybrid-nl2sql-mysql hybrid-nl2sql-postgres; do
+for container in hybrid-nl2sql-mysql hybrid-nl2sql-postgres hybrid-nl2sql-rustfs hybrid-nl2sql-polaris; do
   if "${PODMAN[@]}" container exists "${container}"; then
     "${PODMAN[@]}" rm -f "${container}" >/dev/null
   fi

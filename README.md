@@ -27,8 +27,8 @@ The intended request flow is:
    - JDBC-accessible MySQL, PostgreSQL, and Oracle sources
 6. The backend returns generated SQL, execution status, and result rows to the UI.
 
-More detail is in [docs/architecture.md](/home/opc/hybrid-nl2sql/docs/architecture.md).
-For a live local JDBC metadata exercise, see [docs/local-metadata-lab.md](/home/opc/hybrid-nl2sql/docs/local-metadata-lab.md).
+More detail is in [docs/architecture.md](docs/architecture.md).
+For a live local JDBC metadata exercise, see [docs/local-metadata-lab.md](docs/local-metadata-lab.md).
 
 ## Repo Layout
 
@@ -55,22 +55,46 @@ docker compose up --build
 Backend:
 
 ```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+/datastore/hybrid-nl2sql/scripts/start-backend.sh
+```
+
+If port `8000` is already in use, start the backend on another port:
+
+```bash
+BACKEND_PORT=8001 /datastore/hybrid-nl2sql/scripts/start-backend.sh
 ```
 
 Frontend:
 
 ```bash
-cd frontend
-npm install
-npm run dev
+/datastore/hybrid-nl2sql/scripts/start-frontend.sh
+```
+
+If the backend is running on a non-default port, start the frontend with the same `BACKEND_PORT` so the Vite proxy points at the right API:
+
+```bash
+BACKEND_PORT=8001 /datastore/hybrid-nl2sql/scripts/start-frontend.sh
 ```
 
 For access from another machine on the same network, the frontend dev server binds to `0.0.0.0:5173`. The backend should also be started with `--host 0.0.0.0` if you want the browser on another host to reach the API directly.
+
+## Polaris Setup
+
+To enable the `polaris` source in the backend, set these environment variables in `.env` or `.env.local-services`:
+
+```bash
+POLARIS_URI=https://<your-polaris-host>/api/catalog
+POLARIS_WAREHOUSE=<polaris-catalog-name>
+POLARIS_SCOPE=PRINCIPAL_ROLE:ALL
+POLARIS_CREDENTIAL=<client-id>:<client-secret>
+```
+
+Notes:
+
+- `POLARIS_WAREHOUSE` should be the catalog or warehouse name exposed by Polaris, not an object storage URI.
+- The backend auto-adds the default Iceberg Spark runtime package when Polaris is enabled. Override `SPARK_ICEBERG_RUNTIME_PACKAGE` if your Spark build needs a different coordinate.
+- If your Polaris deployment gives you a bearer token directly, use `POLARIS_TOKEN` instead of `POLARIS_CREDENTIAL`.
+- For extra Iceberg REST catalog properties, use `POLARIS_CATALOG_OPTIONS` with `key=value` pairs separated by `;`.
 
 Local metadata lab:
 
@@ -79,6 +103,7 @@ cp .env.local-services.example .env.local-services
 ./scripts/podman-local-services-up.sh
 python3 -m venv .venv
 .venv/bin/pip install -e backend
+./scripts/seed-local-polaris.sh
 ./scripts/run-local-metadata-exercise.sh
 ```
 

@@ -16,10 +16,14 @@ class OCIChatModelFactory:
 
         return ChatOCIGenAI(
             model_id=self.settings.oci_model_id,
+            provider="cohere",
             service_endpoint=self.settings.oci_service_endpoint,
             compartment_id=self.settings.oci_compartment_id,
             auth_profile=self.settings.oci_auth_profile,
             auth_file_location=self.settings.oci_config_file,
-            model_kwargs={"temperature": 0},
+            model_kwargs={
+                "temperature": 0,
+                "max_tokens": 600,
+                "top_p": 0.75,
+            },
         )
-

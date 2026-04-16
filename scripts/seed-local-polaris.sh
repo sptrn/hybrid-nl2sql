@@ -6,7 +6,6 @@ ENV_FILE="${1:-${ROOT_DIR}/.env.local-services}"
 
 if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Missing env file: ${ENV_FILE}" >&2
-  echo "Copy ${ROOT_DIR}/.env.local-services.example to ${ROOT_DIR}/.env.local-services first." >&2
   exit 1
 fi
 
@@ -16,9 +15,6 @@ if [[ ! -x "${ROOT_DIR}/.venv/bin/python" ]]; then
   exit 1
 fi
 
-if [[ -f "${ENV_FILE}" ]]; then
-  "${ROOT_DIR}/scripts/seed-local-polaris.sh" "${ENV_FILE}"
-fi
-
+APP_ENV_FILE="${ENV_FILE}" \
 PYTHONPATH="${ROOT_DIR}/backend:${PYTHONPATH:-}" \
-  "${ROOT_DIR}/.venv/bin/python" "${ROOT_DIR}/scripts/exercise_sources_endpoint.py" "${ENV_FILE}"
+  "${ROOT_DIR}/.venv/bin/python" "${ROOT_DIR}/scripts/seed_local_polaris_catalog.py"
