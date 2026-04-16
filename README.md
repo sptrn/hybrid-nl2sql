@@ -38,6 +38,89 @@ frontend/     React + Vite web interface
 docs/         Architecture and implementation notes
 ```
 
+## Installation Prerequisites
+
+Before testing this stack in your own environment, make sure you have:
+
+- A Linux, macOS, or Windows host that can run Docker Engine or Podman.
+- At least 4 CPU cores and 8 GB RAM available for the containers, especially when Spark and Polaris are enabled.
+- Network access from the host to any external systems you plan to query:
+  `OCI Generative AI`, `Polaris`, `MySQL`, `PostgreSQL`, and `Oracle`.
+- A valid OCI config file if you want to use OCI-backed SQL generation:
+  `~/.oci/config` plus the matching API key material.
+- A populated `.env` file with the connection details for the sources you want to enable.
+- Open host ports for:
+  `8000` for the backend API and `5173` for the frontend UI, or custom ports if you remap them.
+
+Notes:
+
+- If you only want to test the UI and API shell, you can leave OCI and database credentials unset and the app will still start in fallback mode.
+- If you are using Podman instead of Docker, substitute `podman` and `podman compose` for the Docker commands below.
+
+## Install From Prebuilt Docker Images
+
+If your team publishes prebuilt images for this repo, users can test the stack without building from source.
+
+1. Copy `.env.example` to `.env` and fill in the required OCI and source connection settings.
+2. Make sure your OCI config is available on the host at `~/.oci`.
+3. Pull the published images from your container registry:
+
+```bash
+docker pull <registry>/<namespace>/hybrid-nl2sql-backend:<tag>
+docker pull <registry>/<namespace>/hybrid-nl2sql-frontend:<tag>
+```
+
+4. Create a compose file for image-based deployment, for example `docker-compose.images.yml`:
+
+```yaml
+services:
+  backend:
+    image: <registry>/<namespace>/hybrid-nl2sql-backend:<tag>
+    env_file:
+      - .env
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ${HOME}/.oci:/root/.oci:ro
+
+  frontend:
+    image: <registry>/<namespace>/hybrid-nl2sql-frontend:<tag>
+    env_file:
+      - .env
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      - backend
+```
+
+5. Start the stack:
+
+```bash
+docker compose -f docker-compose.images.yml up -d
+```
+
+6. Verify the installation:
+
+- Open the UI at `http://localhost:5173`
+- Open the API docs at `http://localhost:8000/docs`
+- Check the health endpoint:
+
+```bash
+curl http://localhost:8000/api/v1/health
+```
+
+7. Stop the stack when you are done:
+
+```bash
+docker compose -f docker-compose.images.yml down
+```
+
+Recommended first tests after the containers are up:
+
+- Open the `NL2SQL Dashboard` tab and submit a simple prompt such as `Show the latest orders from Polaris.`
+- Open the `Backup To Iceberg` tab and verify that MySQL or PostgreSQL tables are discoverable before running a backup.
+- Confirm that the `Runtime` card shows the expected `LLM mode` and `Spark` readiness.
+
 ## Quick Start
 
 1. Copy `.env.example` to `.env` and fill in your OCI and data-source settings.
