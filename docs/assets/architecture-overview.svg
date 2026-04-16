@@ -1,0 +1,150 @@
+<svg width="1400" height="980" viewBox="0 0 1400 980" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1400" y2="980" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7F1E7"/>
+      <stop offset="1" stop-color="#EEF4F2"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F6F1E8"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" orient="auto-start-reverse">
+      <path d="M1 1L11 6L1 11V1Z" fill="#24554F"/>
+    </marker>
+    <style>
+      .title { font: 700 36px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #132026; }
+      .subtitle { font: 500 18px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #496066; }
+      .section { font: 700 22px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #132026; }
+      .box-title { font: 700 18px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #132026; }
+      .box-copy { font: 500 14px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #415359; }
+      .small { font: 600 13px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #5F6B73; letter-spacing: 0.08em; text-transform: uppercase; }
+      .flow-title { font: 700 16px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #132026; }
+      .flow-copy { font: 500 13px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #415359; }
+      .pill { font: 700 14px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #24554F; }
+      .num { font: 700 18px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: white; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="980" rx="28" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1344" height="924" rx="24" fill="rgba(255,255,255,0.55)" stroke="#D8E1DE"/>
+
+  <text x="64" y="86" class="title">Hybrid NL2SQL Architecture</text>
+  <text x="64" y="116" class="subtitle">Components, source topology, and query-to-answer flow for OCI GenAI + Spark + Polaris</text>
+
+  <text x="64" y="165" class="small">System Components</text>
+
+  <rect x="64" y="188" width="220" height="130" rx="18" fill="url(#panel)" stroke="#D6DFDC"/>
+  <text x="88" y="224" class="box-title">Frontend</text>
+  <text x="88" y="252" class="box-copy">React + Vite dashboard</text>
+  <text x="88" y="274" class="box-copy">NL2SQL tab for querying</text>
+  <text x="88" y="296" class="box-copy">Backup tab for MySQL /</text>
+  <text x="88" y="314" class="box-copy">PostgreSQL to Iceberg</text>
+
+  <rect x="326" y="188" width="240" height="130" rx="18" fill="url(#panel)" stroke="#D6DFDC"/>
+  <text x="350" y="224" class="box-title">Backend API</text>
+  <text x="350" y="252" class="box-copy">FastAPI endpoints</text>
+  <text x="350" y="274" class="box-copy">/health, /sources, /query</text>
+  <text x="350" y="296" class="box-copy">/backup/options, /backup/run</text>
+
+  <rect x="608" y="188" width="250" height="130" rx="18" fill="url(#panel)" stroke="#D6DFDC"/>
+  <text x="632" y="224" class="box-title">Agent + Guardrails</text>
+  <text x="632" y="252" class="box-copy">OCI / Cohere structured SQL</text>
+  <text x="632" y="274" class="box-copy">Source selection and rationale</text>
+  <text x="632" y="296" class="box-copy">Read-only / source-scope checks</text>
+
+  <rect x="900" y="188" width="250" height="130" rx="18" fill="url(#panel)" stroke="#D6DFDC"/>
+  <text x="924" y="224" class="box-title">Spark Execution Plane</text>
+  <text x="924" y="252" class="box-copy">Unified SQL boundary</text>
+  <text x="924" y="274" class="box-copy">JDBC reads + Iceberg catalog</text>
+  <text x="924" y="296" class="box-copy">Query execution and backups</text>
+
+  <rect x="1192" y="188" width="144" height="130" rx="18" fill="url(#panel)" stroke="#D6DFDC"/>
+  <text x="1216" y="224" class="box-title">Metadata</text>
+  <text x="1216" y="252" class="box-copy">Spark catalog</text>
+  <text x="1216" y="274" class="box-copy">inspection</text>
+  <text x="1216" y="296" class="box-copy">information_schema</text>
+
+  <path d="M284 252H326" stroke="#24554F" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M566 252H608" stroke="#24554F" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M858 252H900" stroke="#24554F" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M1150 252H1192" stroke="#24554F" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M1192 286H1130C1106 286 1094 298 1094 318V350" stroke="#D9822B" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <text x="64" y="376" class="small">Data and Catalog Topology</text>
+
+  <rect x="64" y="400" width="388" height="210" rx="22" fill="#132026"/>
+  <text x="92" y="438" class="section" fill="#F7F1E8">Operational Sources</text>
+  <rect x="92" y="460" width="155" height="112" rx="16" fill="#FFF9F1" stroke="#E8D6BE"/>
+  <text x="112" y="492" class="box-title">MySQL</text>
+  <text x="112" y="516" class="box-copy">customers</text>
+  <text x="112" y="536" class="box-copy">orders</text>
+  <text x="112" y="556" class="box-copy">regional CRM data</text>
+  <rect x="269" y="460" width="155" height="112" rx="16" fill="#F3F7FF" stroke="#CAD7F3"/>
+  <text x="289" y="492" class="box-title">PostgreSQL</text>
+  <text x="289" y="516" class="box-copy">inventory_products</text>
+  <text x="289" y="536" class="box-copy">shipments</text>
+  <text x="289" y="556" class="box-copy">operational activity</text>
+
+  <rect x="506" y="400" width="388" height="210" rx="22" fill="#F8EEE2" stroke="#D7C8B3"/>
+  <text x="534" y="438" class="section">Polaris + Iceberg</text>
+  <rect x="534" y="460" width="155" height="112" rx="16" fill="#FFFFFF" stroke="#D6DFDC"/>
+  <text x="554" y="492" class="box-title">Live Lakehouse</text>
+  <text x="554" y="516" class="box-copy">polaris.sales.orders</text>
+  <text x="554" y="536" class="box-copy">polaris.sales.customers</text>
+  <text x="554" y="556" class="box-copy">current Iceberg tables</text>
+  <rect x="711" y="460" width="155" height="112" rx="16" fill="#FFFFFF" stroke="#D6DFDC"/>
+  <text x="731" y="492" class="box-title">Backup Namespaces</text>
+  <text x="731" y="516" class="box-copy">polaris.backups.mysql...</text>
+  <text x="731" y="536" class="box-copy">polaris.backups.postgresql...</text>
+  <text x="731" y="556" class="box-copy">historical copies</text>
+
+  <rect x="948" y="400" width="388" height="210" rx="22" fill="#EEF4F8" stroke="#C9D8E0"/>
+  <text x="976" y="438" class="section">Backup Path</text>
+  <text x="976" y="474" class="box-copy">Backup tab selects table / schema / database</text>
+  <text x="976" y="498" class="box-copy">Spark reads JDBC source tables</text>
+  <text x="976" y="522" class="box-copy">Spark writes Iceberg tables into Polaris namespaces</text>
+  <text x="976" y="546" class="box-copy">Historical data becomes queryable from the NL2SQL tab</text>
+  <rect x="976" y="566" width="178" height="26" rx="13" fill="#D9ECE7"/>
+  <text x="997" y="584" class="pill">Operational data → Iceberg history</text>
+
+  <path d="M452 506H506" stroke="#24554F" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M894 506H948" stroke="#24554F" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <text x="64" y="666" class="small">Query To Answer Flow</text>
+
+  <rect x="64" y="690" width="1272" height="214" rx="24" fill="url(#panel)" stroke="#D6DFDC"/>
+
+  <circle cx="122" cy="752" r="24" fill="#24554F"/><text x="114" y="758" class="num">1</text>
+  <rect x="158" y="720" width="166" height="72" rx="16" fill="#FFFFFF" stroke="#D6DFDC"/>
+  <text x="180" y="748" class="flow-title">User Prompt</text>
+  <text x="180" y="770" class="flow-copy">Natural-language question</text>
+
+  <circle cx="366" cy="752" r="24" fill="#24554F"/><text x="358" y="758" class="num">2</text>
+  <rect x="402" y="720" width="176" height="72" rx="16" fill="#FFFFFF" stroke="#D6DFDC"/>
+  <text x="424" y="748" class="flow-title">Source + Metadata</text>
+  <text x="424" y="770" class="flow-copy">Candidate sources and schema context</text>
+
+  <circle cx="620" cy="752" r="24" fill="#24554F"/><text x="612" y="758" class="num">3</text>
+  <rect x="656" y="720" width="170" height="72" rx="16" fill="#FFFFFF" stroke="#D6DFDC"/>
+  <text x="678" y="748" class="flow-title">OCI SQL Plan</text>
+  <text x="678" y="770" class="flow-copy">Structured SQL + rationale</text>
+
+  <circle cx="868" cy="752" r="24" fill="#24554F"/><text x="860" y="758" class="num">4</text>
+  <rect x="904" y="720" width="170" height="72" rx="16" fill="#FFFFFF" stroke="#D6DFDC"/>
+  <text x="926" y="748" class="flow-title">Guardrails</text>
+  <text x="926" y="770" class="flow-copy">Read-only and source checks</text>
+
+  <circle cx="1116" cy="752" r="24" fill="#24554F"/><text x="1108" y="758" class="num">5</text>
+  <rect x="1152" y="720" width="150" height="72" rx="16" fill="#FFFFFF" stroke="#D6DFDC"/>
+  <text x="1174" y="748" class="flow-title">Spark Run</text>
+  <text x="1174" y="770" class="flow-copy">Execute against source</text>
+
+  <path d="M324 756H402" stroke="#24554F" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M578 756H656" stroke="#24554F" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M826 756H904" stroke="#24554F" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M1074 756H1152" stroke="#24554F" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="158" y="822" width="1144" height="50" rx="16" fill="#E9F3EF" stroke="#C8DDD7"/>
+  <text x="190" y="853" class="flow-title">6. Dashboard Answer</text>
+  <text x="366" y="853" class="flow-copy">Results grid, graphs, generated SQL, guardrail decisions, backup badges, and per-source execution summaries</text>
+</svg>
